@@ -5,30 +5,30 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Shopping Cart Icon - Centered in safe zone -->
+    <!-- Shopping Cart Icon - Monochrome version for themed icons -->
 
     <!-- Cart handle and body -->
     <path
         android:fillColor="#00000000"
         android:pathData="M30,36 L36,36 L36,40 L72,40 L68,58 L42,58 L38,42"
         android:strokeWidth="3"
-        android:strokeColor="#FFFFFF"
+        android:strokeColor="#000000"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
 
     <!-- Cart basket fill -->
     <path
-        android:fillColor="#FFFFFF"
+        android:fillColor="#000000"
         android:pathData="M40,44 L70,44 L67,56 L43,56 Z" />
 
     <!-- Left wheel (circle as path) -->
     <path
-        android:fillColor="#FFFFFF"
+        android:fillColor="#000000"
         android:pathData="M46,65 m-4,0 a4,4 0,1 1,8 0 a4,4 0,1 1,-8 0" />
 
     <!-- Right wheel (circle as path) -->
     <path
-        android:fillColor="#FFFFFF"
+        android:fillColor="#000000"
         android:pathData="M64,65 m-4,0 a4,4 0,1 1,8 0 a4,4 0,1 1,-8 0" />
 
     <!-- Checkmark on cart -->
@@ -36,7 +36,7 @@
         android:fillColor="#00000000"
         android:pathData="M48,49 L53,54 L62,45"
         android:strokeWidth="2.5"
-        android:strokeColor="#4CAF50"
+        android:strokeColor="#000000"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
 

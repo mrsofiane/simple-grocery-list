@@ -14,21 +14,32 @@ android {
         applicationId = "me.mrsofiane.simplegrocerylist"
         minSdk = 21
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
     }
+
+    // Signing config placeholder - configure before release
+    // signingConfigs {
+    //     create("release") {
+    //         storeFile = file("keystore.jks")
+    //         storePassword = System.getenv("KEYSTORE_PASSWORD")
+    //         keyAlias = "release"
+    //         keyPassword = System.getenv("KEY_PASSWORD")
+    //     }
+    // }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
