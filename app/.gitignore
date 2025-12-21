@@ -1,1 +1,4 @@
 /build
+*.jks
+*.jls
+keystore/
