@@ -54,6 +54,41 @@ class GroceryViewModel(
         save()
     }
 
+    fun updateItem(item: GroceryItem) {
+        val trimmedName = item.name.trim()
+        if (trimmedName.isBlank()) return
+
+        val validItem = item.copy(
+            name = trimmedName.take(MAX_NAME_LENGTH),
+            quantity = item.quantity.trim().take(MAX_QUANTITY_LENGTH)
+        )
+        _items.value = _items.value.map {
+            if (it.id == validItem.id) validItem else it
+        }
+        save()
+    }
+
+    fun exportAsJson(): String {
+        return gson.toJson(_items.value)
+    }
+
+    fun importFromJson(json: String): Boolean {
+        return try {
+            val type = object : TypeToken<List<GroceryItem>>() {}.type
+            val importedItems: List<GroceryItem>? = gson.fromJson(json, type)
+            if (importedItems != null && importedItems.isNotEmpty()) {
+                _items.value = importedItems.filter { it.name.isNotBlank() }
+                save()
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to import items", e)
+            false
+        }
+    }
+
     private fun loadItems(): List<GroceryItem> {
         val json = prefs.getString("items", null) ?: return emptyList()
         return try {

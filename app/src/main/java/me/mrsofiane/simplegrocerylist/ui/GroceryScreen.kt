@@ -1,5 +1,9 @@
 package me.mrsofiane.simplegrocerylist.ui
 
+import android.content.Intent
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -25,14 +29,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -52,6 +61,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -59,6 +69,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -104,7 +115,7 @@ fun getCategoryIcon(category: String): ImageVector {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GroceryScreen(viewModel: GroceryViewModel) {
-
+    val context = LocalContext.current
     val items by viewModel.items.collectAsState()
 
     var name by remember { mutableStateOf("") }
@@ -113,8 +124,31 @@ fun GroceryScreen(viewModel: GroceryViewModel) {
     var hideChecked by remember { mutableStateOf(false) }
     var filterCategory by remember { mutableStateOf("All") }
     var isInputExpanded by remember { mutableStateOf(false) }
+    var editingItem by remember { mutableStateOf<GroceryItem?>(null) }
+    var showMenu by remember { mutableStateOf(false) }
+    var showImportDialog by remember { mutableStateOf(false) }
+    var importJsonText by remember { mutableStateOf("") }
 
     val categories = listOf("General", "Fruits", "Vegetables", "Dairy", "Meat", "Household")
+
+    // File picker for importing JSON
+    val jsonFilePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            try {
+                val inputStream = context.contentResolver.openInputStream(it)
+                val json = inputStream?.bufferedReader()?.use { reader -> reader.readText() } ?: ""
+                if (viewModel.importFromJson(json)) {
+                    Toast.makeText(context, "List imported successfully!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Failed to import: Invalid format", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(context, "Failed to read file", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     val visibleItems = items.filter {
         (if (hideChecked) !it.isChecked else true) &&
@@ -125,6 +159,80 @@ fun GroceryScreen(viewModel: GroceryViewModel) {
     val totalItems = items.size
     val checkedItems = items.count { it.isChecked }
     val progress = if (totalItems > 0) checkedItems.toFloat() / totalItems else 0f
+
+    // Edit Dialog
+    editingItem?.let { item ->
+        EditItemDialog(
+            item = item,
+            categories = categories,
+            onDismiss = { editingItem = null },
+            onSave = { updatedItem ->
+                viewModel.updateItem(updatedItem)
+                editingItem = null
+            }
+        )
+    }
+
+    // Import Dialog
+    if (showImportDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showImportDialog = false
+                importJsonText = ""
+            },
+            title = { Text("Import List") },
+            text = {
+                Column {
+                    Text(
+                        "Paste JSON data or import from file:",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = importJsonText,
+                        onValueChange = { importJsonText = it },
+                        label = { Text("JSON data") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp),
+                        maxLines = 8
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Button(
+                        onClick = { jsonFilePicker.launch("application/json") },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Import from File")
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (importJsonText.isNotBlank()) {
+                            if (viewModel.importFromJson(importJsonText)) {
+                                Toast.makeText(context, "List imported successfully!", Toast.LENGTH_SHORT).show()
+                                showImportDialog = false
+                                importJsonText = ""
+                            } else {
+                                Toast.makeText(context, "Failed to import: Invalid format", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                ) {
+                    Text("Import")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showImportDialog = false
+                    importJsonText = ""
+                }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -146,6 +254,47 @@ fun GroceryScreen(viewModel: GroceryViewModel) {
                                 imageVector = if (isInputExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                                 contentDescription = if (isInputExpanded) "Collapse" else "Expand"
                             )
+                        }
+                        // Menu button
+                        Box {
+                            IconButton(onClick = { showMenu = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "Menu"
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = showMenu,
+                                onDismissRequest = { showMenu = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("Share List") },
+                                    onClick = {
+                                        showMenu = false
+                                        val json = viewModel.exportAsJson()
+                                        val sendIntent = Intent().apply {
+                                            action = Intent.ACTION_SEND
+                                            putExtra(Intent.EXTRA_TEXT, json)
+                                            type = "text/plain"
+                                        }
+                                        val shareIntent = Intent.createChooser(sendIntent, "Share grocery list")
+                                        context.startActivity(shareIntent)
+                                    },
+                                    leadingIcon = {
+                                        Icon(Icons.Default.Share, contentDescription = null)
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Import List") },
+                                    onClick = {
+                                        showMenu = false
+                                        showImportDialog = true
+                                    },
+                                    leadingIcon = {
+                                        Icon(Icons.Default.KeyboardArrowDown, contentDescription = null)
+                                    }
+                                )
+                            }
                         }
                     }
                 )
@@ -327,7 +476,8 @@ fun GroceryScreen(viewModel: GroceryViewModel) {
                         SwipeableGroceryRow(
                             item = item,
                             onToggle = { viewModel.toggleItem(item) },
-                            onRemove = { viewModel.removeItem(item) }
+                            onRemove = { viewModel.removeItem(item) },
+                            onEdit = { editingItem = item }
                         )
                     }
                 }
@@ -375,7 +525,8 @@ fun EmptyState(
 fun SwipeableGroceryRow(
     item: GroceryItem,
     onToggle: () -> Unit,
-    onRemove: () -> Unit
+    onRemove: () -> Unit,
+    onEdit: () -> Unit
 ) {
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { dismissValue ->
@@ -418,7 +569,8 @@ fun SwipeableGroceryRow(
         GroceryRow(
             item = item,
             onToggle = onToggle,
-            onRemove = onRemove
+            onRemove = onRemove,
+            onEdit = onEdit
         )
     }
 }
@@ -427,7 +579,8 @@ fun SwipeableGroceryRow(
 fun GroceryRow(
     item: GroceryItem,
     onToggle: () -> Unit,
-    onRemove: () -> Unit
+    onRemove: () -> Unit,
+    onEdit: () -> Unit
 ) {
     val categoryColor = getCategoryColor(item.category)
     val alpha by animateFloatAsState(
@@ -496,6 +649,13 @@ fun GroceryRow(
                         checked = item.isChecked,
                         onCheckedChange = { onToggle() }
                     )
+                    IconButton(onClick = onEdit) {
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = "Edit",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                     IconButton(onClick = onRemove) {
                         Icon(
                             Icons.Default.Delete,
@@ -564,4 +724,74 @@ fun CategoryDropdown(
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditItemDialog(
+    item: GroceryItem,
+    categories: List<String>,
+    onDismiss: () -> Unit,
+    onSave: (GroceryItem) -> Unit
+) {
+    var editName by remember { mutableStateOf(item.name) }
+    var editQuantity by remember { mutableStateOf(item.quantity) }
+    var editCategory by remember { mutableStateOf(item.category) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Edit Item") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = editName,
+                    onValueChange = { editName = it },
+                    label = { Text("Item name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = editQuantity,
+                    onValueChange = { editQuantity = it },
+                    label = { Text("Quantity") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                CategoryDropdown(
+                    label = "Category",
+                    options = categories,
+                    selected = editCategory,
+                    onSelect = { editCategory = it }
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (editName.isNotBlank()) {
+                        onSave(
+                            item.copy(
+                                name = editName,
+                                quantity = editQuantity,
+                                category = editCategory
+                            )
+                        )
+                    }
+                }
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }

@@ -1,10 +1,22 @@
 # Release Notes
 
-## Version 1.1.0 (Version Code: 2)
+## Version 1.1.0 (Version Code: 3)
 
 ### What's New
 
 **New Features:**
+- Edit items after adding (tap the pencil icon)
+- Share your list with others via JSON export
+- Import lists shared by friends or family
+- Menu (3 dots) in top bar for share/import options
+
+---
+
+## Version 1.0.0 (Version Code: 2)
+
+### What's New
+
+**Features:**
 - Swipe left to delete items quickly
 - Progress bar showing shopping completion
 - Category color indicators for easy identification
@@ -27,7 +39,7 @@
 
 ---
 
-## Version 1.0.0 (Version Code: 1)
+## Version 0.1.0 (Version Code: 1)
 
 ### Initial Release
 - Create and manage grocery lists
@@ -44,12 +56,9 @@
 ## For v1.1.0:
 
 New in this update:
-- Swipe left to delete items
-- Progress bar to track your shopping
-- Category colors for easy identification
-- Collapsible input form
-- "Hide completed" toggle
-- Beautiful animations
-- Improved reliability
+- Edit items after adding them (tap the pencil icon)
+- Share your grocery list with family and friends
+- Import lists shared by others
+- New menu in top bar for quick access
 
 Thank you for using Grocery List!
