@@ -39,6 +39,10 @@
 -keep class me.mrsofiane.simplegrocerylist.model.GroceryItem { *; }
 -keepclassmembers class me.mrsofiane.simplegrocerylist.model.GroceryItem { *; }
 
+# Keep TypeToken for Gson
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken
+
 # ==================== KOTLIN ====================
 # Keep Kotlin Metadata
 -keepattributes RuntimeVisibleAnnotations
