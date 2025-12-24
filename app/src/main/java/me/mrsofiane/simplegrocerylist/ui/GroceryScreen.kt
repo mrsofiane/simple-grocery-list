@@ -139,13 +139,14 @@ fun GroceryScreen(viewModel: GroceryViewModel) {
             try {
                 val inputStream = context.contentResolver.openInputStream(it)
                 val json = inputStream?.bufferedReader()?.use { reader -> reader.readText() } ?: ""
-                if (viewModel.importFromJson(json)) {
-                    Toast.makeText(context, "List imported successfully!", Toast.LENGTH_SHORT).show()
+                val count = viewModel.importFromJson(json)
+                if (count > 0) {
+                    Toast.makeText(context, "Imported $count items", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(context, "Failed to import: Invalid format", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Invalid file format", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, "Failed to read file", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Could not read file", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -199,7 +200,7 @@ fun GroceryScreen(viewModel: GroceryViewModel) {
                     )
                     Spacer(Modifier.height(8.dp))
                     Button(
-                        onClick = { jsonFilePicker.launch("application/json") },
+                        onClick = { jsonFilePicker.launch("*/*") },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("Import from File")
@@ -210,12 +211,13 @@ fun GroceryScreen(viewModel: GroceryViewModel) {
                 TextButton(
                     onClick = {
                         if (importJsonText.isNotBlank()) {
-                            if (viewModel.importFromJson(importJsonText)) {
-                                Toast.makeText(context, "List imported successfully!", Toast.LENGTH_SHORT).show()
+                            val count = viewModel.importFromJson(importJsonText)
+                            if (count > 0) {
+                                Toast.makeText(context, "Imported $count items", Toast.LENGTH_SHORT).show()
                                 showImportDialog = false
                                 importJsonText = ""
                             } else {
-                                Toast.makeText(context, "Failed to import: Invalid format", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Invalid format", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }

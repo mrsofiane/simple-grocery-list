@@ -72,20 +72,22 @@ class GroceryViewModel(
         return gson.toJson(_items.value)
     }
 
-    fun importFromJson(json: String): Boolean {
+    fun importFromJson(json: String): Int {
+        if (json.isBlank()) return 0
         return try {
             val type = object : TypeToken<List<GroceryItem>>() {}.type
             val importedItems: List<GroceryItem>? = gson.fromJson(json, type)
             if (importedItems != null && importedItems.isNotEmpty()) {
-                _items.value = importedItems.filter { it.name.isNotBlank() }
+                val validItems = importedItems.filter { it.name.isNotBlank() }
+                _items.value = validItems
                 save()
-                true
+                validItems.size
             } else {
-                false
+                0
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to import items", e)
-            false
+            0
         }
     }
 

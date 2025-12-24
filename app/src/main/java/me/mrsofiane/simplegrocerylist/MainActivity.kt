@@ -13,6 +13,7 @@ import me.mrsofiane.simplegrocerylist.viewmodel.GroceryViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         val prefs = getSharedPreferences("grocery_prefs", MODE_PRIVATE)
@@ -21,7 +22,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val darkTheme = isSystemInDarkTheme()
 
-            // Configure status bar based on theme
+            // Update system bar styles based on theme
             DisposableEffect(darkTheme) {
                 enableEdgeToEdge(
                     statusBarStyle = if (darkTheme) {
