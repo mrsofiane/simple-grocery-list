@@ -29,4 +29,5 @@ keystore.properties
 
 # Local store assets (not for public repo)
 /store_assets/
+/store-listing/
 /app/release/
