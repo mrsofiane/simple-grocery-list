@@ -20,6 +20,18 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            val keystorePath = System.getenv("SIGNING_KEYSTORE_PATH")
+            if (keystorePath != null) {
+                storeFile = file(keystorePath)
+                storePassword = System.getenv("SIGNING_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("SIGNING_KEY_ALIAS")
+                keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -30,6 +42,9 @@ android {
             )
             ndk {
                 debugSymbolLevel = "FULL"
+            }
+            if (System.getenv("SIGNING_KEYSTORE_PATH") != null) {
+                signingConfig = signingConfigs.getByName("release")
             }
         }
     }
