@@ -20,9 +20,17 @@ A simple, fast, ad-free grocery shopping list for Android. Free and open source 
 
 ## Screenshots
 
-> Add screenshots here once you're ready. Drop images in `docs/screenshots/` and reference them like:
->
-> `![Main list](docs/screenshots/main.png)`
+<p align="center">
+  <img src="docs/screenshots/1.jpg" width="200" />
+  <img src="docs/screenshots/2.jpg" width="200" />
+  <img src="docs/screenshots/3.jpg" width="200" />
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/4.jpg" width="200" />
+  <img src="docs/screenshots/5.jpg" width="200" />
+  <img src="docs/screenshots/6.jpg" width="200" />
+</p>
 
 ## Tech Stack
 
