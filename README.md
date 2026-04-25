@@ -6,6 +6,11 @@ A simple, fast, ad-free grocery shopping list for Android. Free and open source 
 [![Platform](https://img.shields.io/badge/platform-Android%2021%2B-green.svg)](#)
 [![Language](https://img.shields.io/badge/kotlin-100%25-7F52FF.svg)](#)
 
+## Download
+
+[![Google Play](https://img.shields.io/badge/Google_Play-Download-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=me.mrsofiane.simplegrocerylist)
+[![Obtainium](https://img.shields.io/badge/Obtainium-Add_App-1976D2?style=for-the-badge&logo=android&logoColor=white)](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/mrsofiane/SimpleGroceryList)
+
 ## Features
 
 - Add items with name, quantity, and category
