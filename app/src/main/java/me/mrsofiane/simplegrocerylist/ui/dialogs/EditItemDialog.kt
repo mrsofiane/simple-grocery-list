@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -19,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import me.mrsofiane.simplegrocerylist.model.GroceryItem
 import me.mrsofiane.simplegrocerylist.ui.components.CategoryDropdown
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditItemDialog(
     item: GroceryItem,
