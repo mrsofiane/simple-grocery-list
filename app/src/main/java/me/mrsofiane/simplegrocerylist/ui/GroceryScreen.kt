@@ -38,17 +38,22 @@ import me.mrsofiane.simplegrocerylist.ui.components.AddItemCard
 import me.mrsofiane.simplegrocerylist.ui.components.CategoryDropdown
 import me.mrsofiane.simplegrocerylist.ui.components.EmptyState
 import me.mrsofiane.simplegrocerylist.ui.components.GroceryTopBar
+import me.mrsofiane.simplegrocerylist.ui.components.ListSwitcher
 import me.mrsofiane.simplegrocerylist.ui.components.ProgressStats
 import me.mrsofiane.simplegrocerylist.ui.components.SwipeableGroceryRow
+import me.mrsofiane.simplegrocerylist.ui.dialogs.DeleteListDialog
 import me.mrsofiane.simplegrocerylist.ui.dialogs.EditItemDialog
 import me.mrsofiane.simplegrocerylist.ui.dialogs.ImportDialog
+import me.mrsofiane.simplegrocerylist.ui.dialogs.NewListDialog
+import me.mrsofiane.simplegrocerylist.ui.dialogs.RenameListDialog
 import me.mrsofiane.simplegrocerylist.viewmodel.GroceryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GroceryScreen(viewModel: GroceryViewModel) {
     val context = LocalContext.current
-    val items by viewModel.items.collectAsState()
+    val activeList by viewModel.activeList.collectAsState()
+    val items = activeList?.items ?: emptyList()
 
     var name by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf("") }
@@ -58,6 +63,12 @@ fun GroceryScreen(viewModel: GroceryViewModel) {
     var isInputExpanded by remember { mutableStateOf(false) }
     var editingItem by remember { mutableStateOf<GroceryItem?>(null) }
     var showImportDialog by remember { mutableStateOf(false) }
+    var showSwitcher by remember { mutableStateOf(false) }
+    val lists by viewModel.lists.collectAsState()
+    val activeListId by viewModel.activeListId.collectAsState()
+    var showNewListDialog by remember { mutableStateOf(false) }
+    var showRenameListDialog by remember { mutableStateOf(false) }
+    var showDeleteListDialog by remember { mutableStateOf(false) }
 
     val visibleItems = items.filter {
         (if (hideChecked) !it.isChecked else true) &&
@@ -81,6 +92,55 @@ fun GroceryScreen(viewModel: GroceryViewModel) {
         )
     }
 
+    if (showSwitcher) {
+        ListSwitcher(
+            lists = lists,
+            activeListId = activeListId,
+            onListSelected = { id ->
+                viewModel.setActiveList(id)
+                showSwitcher = false
+            },
+            onCreateNew = {
+                showSwitcher = false
+                showNewListDialog = true
+            },
+            onDismiss = { showSwitcher = false },
+        )
+    }
+
+    if (showNewListDialog) {
+        NewListDialog(
+            onDismiss = { showNewListDialog = false },
+            onCreate = { name ->
+                viewModel.createList(name)
+                showNewListDialog = false
+            },
+        )
+    }
+
+    if (showRenameListDialog) {
+        activeList?.let { list ->
+            RenameListDialog(
+                currentName = list.name,
+                onDismiss = { showRenameListDialog = false },
+                onRename = { newName ->
+                    viewModel.renameList(list.id, newName)
+                    showRenameListDialog = false
+                },
+            )
+        }
+    }
+
+    if (showDeleteListDialog) {
+        activeList?.let { list ->
+            DeleteListDialog(
+                listName = list.name,
+                onDismiss = { showDeleteListDialog = false },
+                onConfirm = { viewModel.deleteList(list.id) },
+            )
+        }
+    }
+
     // Import Dialog
     if (showImportDialog) {
         ImportDialog(
@@ -96,7 +156,7 @@ fun GroceryScreen(viewModel: GroceryViewModel) {
         Scaffold(
             topBar = {
                 GroceryTopBar(
-                    title = "Grocery List",
+                    title = activeList?.name ?: "Grocery List",
                     isInputExpanded = isInputExpanded,
                     onToggleInput = { isInputExpanded = !isInputExpanded },
                     onShareClick = {
@@ -113,7 +173,10 @@ fun GroceryScreen(viewModel: GroceryViewModel) {
                             )
                         )
                     },
-                    onImportClick = { showImportDialog = true }
+                    onImportClick = { showImportDialog = true },
+                    onTitleClick = { showSwitcher = true },
+                    onRenameClick = { showRenameListDialog = true },
+                    onDeleteClick = { showDeleteListDialog = true },
                 )
             },
             floatingActionButton = {
@@ -132,7 +195,6 @@ fun GroceryScreen(viewModel: GroceryViewModel) {
                             selectedCategory = "General"
                             isInputExpanded = false
                         } else {
-                            // Open input if trying to add with empty name
                             isInputExpanded = true
                         }
                     }
