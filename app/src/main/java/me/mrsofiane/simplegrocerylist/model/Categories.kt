@@ -15,7 +15,6 @@ import me.mrsofiane.simplegrocerylist.ui.theme.CategoryVegetables
 
 val Categories = listOf("General", "Fruits", "Vegetables", "Dairy", "Meat", "Household")
 
-// Helper function to get category color
 fun getCategoryColor(category: String): Color {
     return when (category) {
         "Fruits" -> CategoryFruits
@@ -27,7 +26,6 @@ fun getCategoryColor(category: String): Color {
     }
 }
 
-// Helper function to get category icon
 fun getCategoryIcon(category: String): ImageVector {
     return when (category) {
         "Fruits" -> Icons.Default.ShoppingCart
