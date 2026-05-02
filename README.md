@@ -3,7 +3,7 @@
 A simple, fast, ad-free grocery shopping list for Android. Free and open source software, licensed under [GPL-3.0](LICENSE).
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Android%2021%2B-green.svg)](#)
+[![Platform](https://img.shields.io/badge/platform-Android%2023%2B-green.svg)](#)
 [![Language](https://img.shields.io/badge/kotlin-100%25-7F52FF.svg)](#)
 
 ## Download
@@ -13,6 +13,7 @@ A simple, fast, ad-free grocery shopping list for Android. Free and open source 
 
 ## Features
 
+- Multiple lists — one per store, trip, or whatever you want; tap the title to switch
 - Add items with name, quantity, and category
 - Built-in categories: Fruits, Vegetables, Dairy, Meat, Household, General
 - Tap to mark purchased, swipe left to delete
@@ -43,12 +44,13 @@ A simple, fast, ad-free grocery shopping list for Android. Free and open source 
 - **UI:** Jetpack Compose + Material 3
 - **Architecture:** Single-activity, ViewModel + Compose state
 - **Persistence:** `SharedPreferences` with Gson serialization
-- **Min SDK:** 21 (Android 5.0)  •  **Target SDK:** 36
+- **Min SDK:** 23 (Android 6.0)  •  **Target SDK:** 36
+- **Build:** Gradle 9.5, AGP 8.13, Kotlin 2.0
 
 ## Build From Source
 
 Requirements:
-- JDK 11+
+- JDK 17+
 - Android Studio (Ladybug or newer) **or** the Android SDK + Gradle wrapper
 - Android SDK platform 36
 
@@ -72,16 +74,6 @@ To produce a release build (you'll need your own signing config):
 
 ```bash
 ./gradlew assembleRelease
-```
-
-## Project Structure
-
-```
-app/src/main/java/me/mrsofiane/simplegrocerylist/
-├── MainActivity.kt
-├── model/         # GroceryItem data class
-├── ui/            # Compose screens & theme
-└── viewmodel/     # GroceryViewModel
 ```
 
 ## Privacy
