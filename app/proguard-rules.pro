@@ -35,9 +35,9 @@
 }
 
 # ==================== DATA MODEL ====================
-# Keep the GroceryItem data class for Gson serialization
--keep class me.mrsofiane.simplegrocerylist.model.GroceryItem { *; }
--keepclassmembers class me.mrsofiane.simplegrocerylist.model.GroceryItem { *; }
+# Keep all model classes (data classes used by Gson)
+-keep class me.mrsofiane.simplegrocerylist.model.** { *; }
+-keepclassmembers class me.mrsofiane.simplegrocerylist.model.** { *; }
 
 # Keep TypeToken for Gson
 -keep class com.google.gson.reflect.TypeToken { *; }
