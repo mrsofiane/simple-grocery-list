@@ -1,7 +1,5 @@
 package me.mrsofiane.simplegrocerylist.ui.components
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,7 +27,6 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -65,24 +62,18 @@ fun SwipeableGroceryRow(
         modifier = modifier,
         state = dismissState,
         backgroundContent = {
-            // Delete background
-            val color by animateColorAsState(
-                targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart)
-                    DeleteRed else Color.Transparent,
-                label = "delete_bg_color"
-            )
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(12.dp))
-                    .background(color)
+                    .background(DeleteRed)
                     .padding(horizontal = 20.dp),
-                contentAlignment = Alignment.CenterEnd
+                contentAlignment = Alignment.CenterEnd,
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Delete",
-                    tint = Color.White
+                    tint = Color.White,
                 )
             }
         },
@@ -106,85 +97,75 @@ private fun GroceryRow(
     onEdit: () -> Unit
 ) {
     val categoryColor = getCategoryColor(item.category)
-    val alpha by animateFloatAsState(
-        targetValue = if (item.isChecked) 0.6f else 1f,
-        label = "item_alpha"
-    )
 
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .alpha(alpha),
+            .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            // Category color indicator bar
-            Box(
-                modifier = Modifier
-                    .width(6.dp)
-                    .height(72.dp)
-                    .background(categoryColor)
-            )
-
+        Box(modifier = Modifier.alpha(if (item.isChecked) 0.5f else 1f)) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = item.name,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            textDecoration = if (item.isChecked) TextDecoration.LineThrough else TextDecoration.None
-                        ),
-                        color = if (item.isChecked)
-                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        else
-                            MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(Modifier.height(2.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Icon(
-                            imageVector = getCategoryIcon(item.category),
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = categoryColor
-                        )
-                        Text(
-                            "${item.quantity.ifBlank { "1" }} • ${item.category}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
+                // Category color indicator bar
+                Box(
+                    modifier = Modifier
+                        .width(6.dp)
+                        .height(72.dp)
+                        .background(categoryColor)
+                )
+
                 Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Checkbox(
-                        checked = item.isChecked,
-                        onCheckedChange = { onToggle() }
-                    )
-                    IconButton(onClick = onEdit) {
-                        Icon(
-                            Icons.Default.Edit,
-                            contentDescription = "Edit",
-                            tint = MaterialTheme.colorScheme.primary
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = item.name,
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                textDecoration = if (item.isChecked) TextDecoration.LineThrough else TextDecoration.None
+                            ),
+                            color = if (item.isChecked)
+                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            else
+                                MaterialTheme.colorScheme.onSurface
                         )
+                        Spacer(Modifier.height(2.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = getCategoryIcon(item.category),
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = categoryColor
+                            )
+                            Text(
+                                "${item.quantity.ifBlank { "1" }} • ${item.category}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
-                    IconButton(onClick = onRemove) {
-                        Icon(
-                            Icons.Default.Delete,
-                            contentDescription = "Remove",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = item.isChecked,
+                            onCheckedChange = { onToggle() }
                         )
+                        IconButton(onClick = onEdit) {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = "Edit",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
             }
